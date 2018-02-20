@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Root from './Root';
+import reactTabEventPlugin from 'react-tap-event-plugin';
+import App from './App';
 import './styles/main.scss';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<Root />, document.getElementById('root'));
+reactTabEventPlugin();
+
+ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

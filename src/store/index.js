@@ -1,10 +1,12 @@
 import configure from './configure';
-import type { Base } from './modules/base';
+import type { Header } from './modules/header';
+import type { Contents } from './modules/contents';
 
 const store = configure();
 
 export default store;
 
 export type State = {
-  base: Base
+  header: Header,
+  contents: Contents
 };

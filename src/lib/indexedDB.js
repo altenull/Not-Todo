@@ -1,76 +1,76 @@
-// It is a library created to make it easier to use IndexedDB by altenull
+import moment from 'moment';
 
-export default class IndexedDB {
-  // #0 Constructor
-  constructor() {
-    // This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
-    this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
-    this.defaultDBName = 'NotTodo';
-    this.defaultStoreName = 'notTodoList';
-  }
+function IndexedDB() {
+  const defaultDBName = 'NotTodoDB';
+  const that = {};
+  let db = null;
 
-  // #1 Open (or create) the IndexedDB
-  openDB = () => {
-    const { indexedDB, defaultDBName } = this;
-    return indexedDB.open(defaultDBName, 2);
-  }
+  const init = () => {
+    const promise = new Promise((resolve, reject) => {
+      // This works on all devices/browsers, and uses IndexedDBShim as a final fallback
+      const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+      const open = indexedDB.open(defaultDBName, 1);
 
-  // #2 Create the schema
-  // This function makes an ObjectStore with keyPath.
+      open.onupgradeneeded = () => {
+        db = open.result;
+        db.createObjectStore(defaultDBName, { keypath: 'date' });
+      };
 
-  // Also, you can make index to search by <key>
-  // name may have duplicates, so we can't use a unique index.
-  // objectStore.createIndex("name", "name", { unique: false });
+      open.onsuccess = () => {
+        db = open.result;
+        resolve(true);
+      };
+    });
+    return promise;
+  };
 
-  // create an index to search by id.
-  // no two people have the same id, so use a unique index.
-  // objectStore.createIndex("id", "id", { unique: true });
-  createSchema = (indexedDBConn, tempData) => {
-    const { defaultStoreName } = this;
-    indexedDBConn.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      const objectStore = db.createObjectStore(defaultStoreName, { keyPath: 'date' });
-      for (let i in tempData) {
-        objectStore.add(tempData[i]);
+  const createNotTodo = (content) => {
+    const promise = new Promise((resolve, reject) => {
+      const tx = db.transaction([defaultDBName], 'readwrite');
+      const store = tx.objectStore(defaultDBName);
+
+      const data = {
+        date: moment().format(),
+        content: content
+      };
+
+      // @Params (data, key)
+      store.add(data, data.date).onsuccess = (event) => {
+        resolve(event.target.result);
       }
-    };
-  }
+    });
+    return promise;
+  };
 
-  // #3 Add the item to IndexedDB
-  addNotTodo = (indexedDBConn) => {
-    const { defaultStoreName } = this;
-    indexedDBConn.onsuccess = (event) => {
-      const db = event.target.result;
-      const transaction = db.transaction(defaultStoreName, 'readwrite');
-      const objectStore = transaction.objectStore(defaultStoreName);
+  const getAllNotTodos = () => {
+    const promise = new Promise((resolve, reject) => {
+      const tx = db.transaction([defaultDBName], 'readonly');
+      const store = tx.objectStore(defaultDBName);
+      let findResult = [];
 
-      // objectStore.put({ something here });
-
-      // Close the DB when the transaction is done
-      transaction.oncomplete = () => {
-        db.close();
-      }
-    }
-  }
-
-  // #4 get all items from IndexedDB
-  getAllNotTodos = (indexedDBConn) => {
-    const { defaultStoreName } = this;
-    let resultArray = [];
-    indexedDBConn.onsuccess = (event) => {
-      const db = event.target.result;
-      const transaction = db.transaction([defaultStoreName]);
-      const objectStore = transaction.objectStore(defaultStoreName);
-
-      objectStore.openCursor().onsuccess = (event) => {
+      store.openCursor().onsuccess = (event) => {
         const cursor = event.target.result;
-        if (cursor) {
-          resultArray.push(cursor.value.date, cursor.value.content);
-          cursor.continue();
-        }
-      }
-    }
-    return resultArray;
-  }
 
+        if (cursor) {
+          findResult.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(findResult);
+        }
+      };
+    });
+    return promise;
+  };
+
+  const close = () => {
+    db.close();
+  };
+
+  that.init = init;
+  that.close = close;
+  that.getAll = getAllNotTodos;
+  that.createNotTodo = createNotTodo;
+  return that;
 }
+
+export default IndexedDB();

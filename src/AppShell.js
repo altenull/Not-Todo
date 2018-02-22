@@ -1,79 +1,71 @@
 import React, { Component } from 'react';
-import { orange500 } from 'material-ui/styles/colors';
+import { connect } from 'react-redux';
+import type { State } from 'store';
+import { BaseActions } from 'store/actionCreators';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { muiTheme } from 'lib/muiTheme';
 import { AppBar } from 'material-ui';
 import LazyDrawer from 'components/base/LazyDrawer';
 import Title from 'components/base/Title';
 import Counter from 'components/base/Counter';
 
 const ContentStyle = {
-  width: '90%',
+  width: '80%',
   margin: 'auto',
   marginTop: '30px'
 };
 
-class AppShell extends Component {
-  state = {
-    open: false,
-    drawer: false
-  };
+// @TODO
+// children: Node
+type Props = {
+  drawer: boolean,
+  open: boolean
+}
 
+class AppShell extends Component<Props> {
   handleDrawerToggle = (e) => {
-    const { open, drawer } = this.state;
-
+    const { drawer } = this.props;
     if (!drawer) {
-      this.setState({
-        drawer: true
-      });
+      BaseActions.lazeDrawer();
       e.preventDefault();
     } else {
-      this.setState({
-        open: !open
-      });
+      BaseActions.reverseDrawer();
     }
   }
 
   render() {
-    console.log('AppShell 랜더');
-    const { children } = this.props;
-    const { open, drawer } = this.state;
+    console.log('AppShell 랜더링');
+    const { open, drawer, children } = this.props;
     const { handleDrawerToggle } = this;
-
-    const muiTheme = getMuiTheme({
-      palette: {
-      },
-      appBar: {
-        color: orange500,
-      },
-    });
 
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
-        <div>
-          <AppBar
-            title={<Title />  }
-            iconClassNameRight="muidocs-icon-navigation-expand-more"
-            iconElementRight={<Counter />}
-            onLeftIconButtonClick={handleDrawerToggle}
+        <AppBar
+          title={<Title />}
+          iconElementRight={<Counter />}
+          onLeftIconButtonClick={handleDrawerToggle}
+        />
+        {drawer
+        &&
+          <LazyDrawer
+            open={open}
+            onRequestChange={open => BaseActions.setDrawer(open)}
+            onClick={() => BaseActions.hideDrawer()}
+            onMounted={() => BaseActions.showDrawer()}
           />
-          {drawer
-          &&
-            <LazyDrawer
-              open={open}
-              onRequestChange={open => this.setState({ open: open})}
-              onClick={() => this.setState({ open: false })}
-              onMounted={() => this.setState({ open: true })}
-            />
-          }
-          <div id="content" style={ContentStyle}>
-            {children}
-          </div>
-          Footer
+        }
+        <div id="content" style={ContentStyle}>
+          {children}
         </div>
       </MuiThemeProvider>
     );
   }
 }
 
-export default AppShell;
+export default connect(
+  ({ base }: State) => ({
+    drawer: base.drawer,
+    open: base.open
+  }),
+  () => ({})
+)(AppShell);

@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import AppShell from './AppShell';
-import EmptyLogo from 'components/base/EmptyLogo';
+import ContentsContainer from 'containers/contents/ContentsContainer';
 
 class App extends Component {
   render() {
+    console.log('App.js 랜더링');
+
     return (
-      <BrowserRouter>
-        <AppShell>
-          <EmptyLogo />
-        </AppShell>
-      </BrowserRouter>
+      <AppShell>
+        <ContentsContainer />
+      </AppShell>
     );
   }
 }

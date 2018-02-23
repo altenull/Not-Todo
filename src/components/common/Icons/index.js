@@ -1,1 +1,0 @@
-export { ClearIcon } from './Icons';

@@ -23,15 +23,20 @@ class LazyDrawerContainer extends Component<Props> {
     HeaderActions.hideDrawer();
   }
 
+  handleCode = () => {
+    window.open('https://github.com/altenull/Not-Todo');
+  }
+
   render() {
     const { open } = this.props;
-    const { handleClear } = this;
+    const { handleClear, handleCode } = this;
 
     return (
       <LazyDrawer
         open={open}
         onRequestChange={open => HeaderActions.setDrawer(open)}
         onClearClick={handleClear}
+        onCodeClick={handleCode}
       />
     );
   }

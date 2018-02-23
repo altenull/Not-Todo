@@ -7,13 +7,15 @@ const SHOW_DIALOG = 'contents/SHOW_DIALOG'
 const HIDE_DIALOG = 'contents/HIDE_DIALOG'
 const SET_NOT_TODO_LIST = 'contents/SET_NOT_TODO_LIST';
 const ADD_NOT_TODO_LIST = 'contents/ADD_NOT_TODO_LIST';
+const CLEAR_NOT_TODO_LIST = 'contents/CLEAR_NOT_TODO_LIST';
 
 export type ContentsActionCreators = {
   initializeContents(): any,
   showDialog(): any,
   hideDialog(): any,
   setNotTodoList(findResult: List): any,
-  addNotTodoList(newNotTodo: object): any
+  addNotTodoList(newNotTodo: object): any,
+  clearNotTodoList(): any
 };
 
 export const actionCreators = {
@@ -21,7 +23,8 @@ export const actionCreators = {
   showDialog: createAction(SHOW_DIALOG),
   hideDialog: createAction(HIDE_DIALOG),
   setNotTodoList: createAction(SET_NOT_TODO_LIST),
-  addNotTodoList: createAction(ADD_NOT_TODO_LIST)
+  addNotTodoList: createAction(ADD_NOT_TODO_LIST),
+  clearNotTodoList: createAction(CLEAR_NOT_TODO_LIST)
 };
 
 export type Contents = {
@@ -41,5 +44,6 @@ export default handleActions({
   [SHOW_DIALOG]: state => state.set('open', true),
   [HIDE_DIALOG]: state => state.set('open', false),
   [SET_NOT_TODO_LIST]: (state, { payload: findResult }) => state.set('notTodoList', fromJS(findResult)),
-  [ADD_NOT_TODO_LIST]: (state, { payload: newNotTodo }) => state.set('notTodoList', state.get('notTodoList').concat(fromJS(newNotTodo)))
+  [ADD_NOT_TODO_LIST]: (state, { payload: newNotTodo }) => state.set('notTodoList', state.get('notTodoList').concat(fromJS(newNotTodo))),
+  [CLEAR_NOT_TODO_LIST]: state => state.set('notTodoList', fromJS([]))
 }, initialState);

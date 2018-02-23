@@ -19,7 +19,6 @@ type Props = {
 
 class AppShell extends Component<Props> {
   render() {
-    console.log('AppShell 랜더링');
     const { drawer, children } = this.props;
 
     return (

@@ -1,7 +1,6 @@
-import moment from 'moment';
-
 function IndexedDB() {
   const defaultDBName = 'NotTodoDB';
+  const defaultStoreName = 'NotTodoStore';
   const that = {};
   let db = null;
 
@@ -13,7 +12,7 @@ function IndexedDB() {
 
       open.onupgradeneeded = () => {
         db = open.result;
-        db.createObjectStore(defaultDBName, { keypath: 'date' });
+        db.createObjectStore(defaultStoreName, { keypath: 'date' });
       };
 
       open.onsuccess = () => {
@@ -24,13 +23,13 @@ function IndexedDB() {
     return promise;
   };
 
-  const createNotTodo = (content) => {
+  const createNotTodo = (date, content) => {
     const promise = new Promise((resolve, reject) => {
-      const tx = db.transaction([defaultDBName], 'readwrite');
-      const store = tx.objectStore(defaultDBName);
+      const tx = db.transaction([defaultStoreName], 'readwrite');
+      const store = tx.objectStore(defaultStoreName);
 
       const data = {
-        date: moment().format(),
+        date: date,
         content: content
       };
 
@@ -44,8 +43,8 @@ function IndexedDB() {
 
   const getAllNotTodos = () => {
     const promise = new Promise((resolve, reject) => {
-      const tx = db.transaction([defaultDBName], 'readonly');
-      const store = tx.objectStore(defaultDBName);
+      const tx = db.transaction([defaultStoreName], 'readonly');
+      const store = tx.objectStore(defaultStoreName);
       let findResult = [];
 
       store.openCursor().onsuccess = (event) => {
@@ -62,14 +61,24 @@ function IndexedDB() {
     return promise;
   };
 
+  const removeAllNotTodos = () => {
+    const promise = new Promise((resolve, reject) => {
+      const tx = db.transaction([defaultStoreName], 'readwrite');
+      const store = tx.objectStore(defaultStoreName);
+      store.clear();
+    });
+    return promise;
+  }
+
   const close = () => {
     db.close();
   };
 
   that.init = init;
   that.close = close;
-  that.getAll = getAllNotTodos;
   that.createNotTodo = createNotTodo;
+  that.getAll = getAllNotTodos;
+  that.removeAll = removeAllNotTodos;
   return that;
 }
 

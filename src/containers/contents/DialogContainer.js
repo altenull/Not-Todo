@@ -11,14 +11,6 @@ type Props = {
 }
 
 class DialogContainer extends Component<Props> {
-  // componentWillMount() {
-  //   IndexedDB.init();
-  // }
-
-  // comopnentWillUnMount() {
-  //   IndexedDB.close();
-  // }
-
   handleClose = () => {
     ContentsActions.hideDialog();
   }

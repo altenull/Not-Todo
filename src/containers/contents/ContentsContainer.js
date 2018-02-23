@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import type { State } from 'store';
-import { ContentsActions } from 'store/actionCreators';
-import IndexedDB from 'lib/IndexedDB';
 import EmptyLogo from 'components/contents/EmptyLogo';
 import MasonryLayout from 'components/contents/MasonryLayout';
 import NotTodo from 'components/contents/NotTodo';
@@ -12,20 +10,7 @@ type Props = {
 }
 
 class ContentsContainer extends Component<Props> {
-  componentWillMount() {
-    IndexedDB.init().then(() => {
-      IndexedDB.getAll().then((findResult) => {
-        ContentsActions.setNotTodoList(findResult);
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    IndexedDB.close();
-  }
-
   render() {
-    console.log('ContentContainer 랜더링');
     const { notTodoList } = this.props;
     let contents = null;
 

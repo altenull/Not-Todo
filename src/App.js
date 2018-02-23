@@ -1,14 +1,26 @@
 import React, { Component } from 'react';
 import AppShell from './AppShell';
-import ContentsContainer from 'containers/contents/ContentsContainer';
+import { ContentsActions } from 'store/actionCreators';
+import ContentsTemplateContainer from 'containers/contents/ContentsTemplateContainer';
+import IndexedDB from 'lib/IndexedDB';
 
 class App extends Component {
-  render() {
-    console.log('App.js 랜더링');
+  componentWillMount() {
+    IndexedDB.init().then(() => {
+      IndexedDB.getAll().then((findResult) => {
+        ContentsActions.setNotTodoList(findResult);
+      });
+    });
+  }
 
+  componentWillUnmount() {
+    IndexedDB.close();
+  }
+
+  render() {
     return (
       <AppShell>
-        <ContentsContainer />
+        <ContentsTemplateContainer />
       </AppShell>
     );
   }
